@@ -24,6 +24,7 @@
     <ProjectGuid>{c7a902c1-9358-4321-90cc-08a265d96dd4}</ProjectGuid>
     <RootNamespace>LatticeBolthman</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Lattice Boltzmann</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -128,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Lattice Bolthman.cpp" />
+    <ClCompile Include="Lattice Boltzmann.cpp" />
     <ClCompile Include="Solver.cpp" />
   </ItemGroup>
   <ItemGroup>

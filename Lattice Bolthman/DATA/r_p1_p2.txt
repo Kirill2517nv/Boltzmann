@@ -14,3 +14,127 @@ Radius = 58.0019	P in drop = 0.756154	P external = 0.684153
 Radius = 58.7977	P in drop = 0.743368	P external = 0.642213
 Radius = 59.3044	P in drop = 0.698588	P external = 0.653154
 Radius = 59.0893	P in drop = 0.679651	P external = 0.653612
+
+
+Radius = 58.0019	P in drop = 0.780678	P external = 0.639301
+Radius = 58.7977	P in drop = 0.780678	P external = 0.639301
+
+
+Radius = 48.1284	P in drop = 0.795806	P external = 0.639469
+Radius = 48.4842	P in drop = 0.795806	P external = 0.639469
+
+
+Radius = 37.9352	P in drop = 0.824249	P external = 0.639607
+Radius = 36.8109	P in drop = 0.824249	P external = 0.639607
+
+
+Radius = 43.2222	P in drop = 0.805131	P external = 0.639541
+Radius = 42.8227	P in drop = 0.805131	P external = 0.639541
+
+
+Radius = 52.9768	P in drop = 0.786691	P external = 0.639351
+Radius = 53.5505	P in drop = 0.786691	P external = 0.639351
+Radius = 63.3628	P in drop = 0.781005	P external = 0.639207
+
+
+
+P in drop = 0.866372	P external = 0.642893	Delta P = 0.223479
+P in drop = 0.874287	P external = 0.642893	Delta P = 0.231394
+P in drop = 0.582556	P external = 0.642893	Delta P = -0.0603372
+P in drop = 0.623234	P external = 0.642893	Delta P = -0.0196591
+P in drop = 0.869354	P external = 0.642893	Delta P = 0.226462
+P in drop = 0.973847	P external = 0.642901	Delta P = 0.330947
+P in drop = 0.967639	P external = 0.642833	Delta P = 0.324805
+P in drop = 0.879634	P external = 0.642442	Delta P = 0.237192
+P in drop = 0.782672	P external = 0.641658	Delta P = 0.141013
+P in drop = 0.746537	P external = 0.64075	Delta P = 0.105786
+P in drop = 0.772158	P external = 0.640072	Delta P = 0.132086
+P in drop = 0.83492	P external = 0.639795	Delta P = 0.195125
+P in drop = 0.885012	P external = 0.639946	Delta P = 0.245066
+P in drop = 0.884588	P external = 0.640596	Delta P = 0.243993
+P in drop = 0.849353	P external = 0.641856	Delta P = 0.207496
+P in drop = 0.816063	P external = 0.643692	Delta P = 0.172371
+P in drop = 0.806612	P external = 0.645868	Delta P = 0.160744
+P in drop = 0.821787	P external = 0.648094	Delta P = 0.173693
+P in drop = 0.845713	P external = 0.650155	Delta P = 0.195558
+P in drop = 0.857966	P external = 0.65194	Delta P = 0.206026
+P in drop = 0.851336	P external = 0.653412	Delta P = 0.197923
+P in drop = 0.835275	P external = 0.654582	Delta P = 0.180693
+P in drop = 0.823489	P external = 0.655488	Delta P = 0.168001
+P in drop = 0.82293	P external = 0.656168	Delta P = 0.166762
+P in drop = 0.831163	P external = 0.656644	Delta P = 0.17452
+P in drop = 0.839959	P external = 0.65692	Delta P = 0.183038
+P in drop = 0.842408	P external = 0.657001	Delta P = 0.185407
+P in drop = 0.838163	P external = 0.656908	Delta P = 0.181254
+P in drop = 0.832089	P external = 0.656692	Delta P = 0.175397
+P in drop = 0.829084	P external = 0.656426	Delta P = 0.172658
+P in drop = 0.830477	P external = 0.656188	Delta P = 0.17429
+P in drop = 0.833994	P external = 0.656036	Delta P = 0.177958
+P in drop = 0.836327	P external = 0.655999	Delta P = 0.180329
+P in drop = 0.835966	P external = 0.656068	Delta P = 0.179897
+P in drop = 0.833954	P external = 0.656215	Delta P = 0.177739
+P in drop = 0.832387	P external = 0.656397	Delta P = 0.175989
+P in drop = 0.832485	P external = 0.656575	Delta P = 0.17591
+P in drop = 0.833886	P external = 0.656718	Delta P = 0.177168
+P in drop = 0.835343	P external = 0.656808	Delta P = 0.178535
+P in drop = 0.835941	P external = 0.65684	Delta P = 0.1791
+P in drop = 0.835728	P external = 0.656821	Delta P = 0.178908
+P in drop = 0.835405	P external = 0.656759	Delta P = 0.178645
+P in drop = 0.835563	P external = 0.656668	Delta P = 0.178894
+P in drop = 0.836243	P external = 0.656558	Delta P = 0.179685
+P in drop = 0.837057	P external = 0.656435	Delta P = 0.180622
+P in drop = 0.837623	P external = 0.656305	Delta P = 0.181318
+P in drop = 0.837868	P external = 0.656173	Delta P = 0.181696
+P in drop = 0.837996	P external = 0.656044	Delta P = 0.181952
+P in drop = 0.838232	P external = 0.655927	Delta P = 0.182305
+P in drop = 0.838635	P external = 0.65583	Delta P = 0.182805
+P in drop = 0.839094	P external = 0.655761	Delta P = 0.183333
+P in drop = 0.839465	P external = 0.655727	Delta P = 0.183737
+P in drop = 0.83969	P external = 0.65573	Delta P = 0.18396
+P in drop = 0.839816	P external = 0.655767	Delta P = 0.184049
+P in drop = 0.83992	P external = 0.655831	Delta P = 0.184089
+P in drop = 0.840043	P external = 0.655915	Delta P = 0.184128
+P in drop = 0.840166	P external = 0.656006	Delta P = 0.18416
+P in drop = 0.840251	P external = 0.656095	Delta P = 0.184156
+P in drop = 0.840281	P external = 0.656173	Delta P = 0.184108
+P in drop = 0.840266	P external = 0.656235	Delta P = 0.184031
+P in drop = 0.840235	P external = 0.656277	Delta P = 0.183958
+P in drop = 0.840203	P external = 0.656297	Delta P = 0.183905
+P in drop = 0.84017	P external = 0.656298	Delta P = 0.183872
+P in drop = 0.840124	P external = 0.656278	Delta P = 0.183846
+P in drop = 0.840058	P external = 0.656241	Delta P = 0.183817
+P in drop = 0.839974	P external = 0.656186	Delta P = 0.183788
+P in drop = 0.839882	P external = 0.656117	Delta P = 0.183766
+P in drop = 0.839792	P external = 0.656034	Delta P = 0.183758
+P in drop = 0.839709	P external = 0.65594	Delta P = 0.183769
+P in drop = 0.839635	P external = 0.655838	Delta P = 0.183796
+P in drop = 0.839569	P external = 0.655733	Delta P = 0.183836
+P in drop = 0.839514	P external = 0.655626	Delta P = 0.183888
+P in drop = 0.839473	P external = 0.655523	Delta P = 0.18395
+P in drop = 0.839449	P external = 0.655425	Delta P = 0.184024
+P in drop = 0.839442	P external = 0.655336	Delta P = 0.184106
+P in drop = 0.83945	P external = 0.655256	Delta P = 0.184194
+P in drop = 0.83947	P external = 0.655187	Delta P = 0.184283
+P in drop = 0.839496	P external = 0.655126	Delta P = 0.18437
+P in drop = 0.839528	P external = 0.655073	Delta P = 0.184455
+P in drop = 0.839561	P external = 0.655026	Delta P = 0.184535
+P in drop = 0.839595	P external = 0.654984	Delta P = 0.184611
+P in drop = 0.839626	P external = 0.654945	Delta P = 0.184682
+P in drop = 0.839653	P external = 0.654908	Delta P = 0.184745
+P in drop = 0.839673	P external = 0.654874	Delta P = 0.1848
+P in drop = 0.839686	P external = 0.654841	Delta P = 0.184845
+P in drop = 0.839692	P external = 0.654811	Delta P = 0.184881
+P in drop = 0.839689	P external = 0.654784	Delta P = 0.184905
+P in drop = 0.839678	P external = 0.65476	Delta P = 0.184918
+P in drop = 0.839659	P external = 0.654739	Delta P = 0.18492
+P in drop = 0.839632	P external = 0.654721	Delta P = 0.184911
+P in drop = 0.839599	P external = 0.654706	Delta P = 0.184892
+P in drop = 0.83956	P external = 0.654695	Delta P = 0.184865
+P in drop = 0.839517	P external = 0.654686	Delta P = 0.184831
+P in drop = 0.839472	P external = 0.654679	Delta P = 0.184793
+P in drop = 0.839426	P external = 0.654675	Delta P = 0.184751
+P in drop = 0.83938	P external = 0.654672	Delta P = 0.184708
+P in drop = 0.839335	P external = 0.65467	Delta P = 0.184664
+P in drop = 0.839291	P external = 0.654669	Delta P = 0.184622
+P in drop = 0.83925	P external = 0.654669	Delta P = 0.184581
+P in drop = 0.839211	P external = 0.65467	Delta P = 0.184541

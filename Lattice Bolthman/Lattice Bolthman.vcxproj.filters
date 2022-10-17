@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lattice Bolthman.cpp">
+    <ClCompile Include="Lattice Boltzmann.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Solver.cpp">

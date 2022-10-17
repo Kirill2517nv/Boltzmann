@@ -84,6 +84,38 @@ void Solver::oneStep()
     collision();
 }
 
+void Solver::oneStepWithoutWalls()
+{
+    set_border_conditions();
+    movement();
+    set_rho_u();
+    set_effrho();
+    set_du_force();
+    collision();
+}
+
+double Solver::PressureVanDerVaals(double& rho, const double& temperature) 
+{
+    double pressure = 8 * temperature * rho / (3 - rho) - 3 * rho * rho;
+    return pressure;
+}
+
+double a(const double& temperature)
+{
+    double omega = 0.1;
+    double m = 0.37464 + 1.54226 * omega - 0.26992 * omega * omega;
+    double a = pow((1 + m * (1 - sqrt(temperature))), 2);
+    return a;
+}
+
+double Solver::PressurePengRobinson(double& rho, const double& temperature)
+{
+    
+    double pressure = 1 / 0.307 * (temperature / (1. / rho - 0.253) - 
+        1.487 * a(temperature) / (1. / rho / rho + 2 * 0.253 / rho - 0.253 * 0.253));
+    return pressure;
+}
+
 void Solver::set_border_conditions()
 {
     f[5][0][0] = f[5][mNx][mNy];
@@ -236,6 +268,8 @@ void Solver::check_rho()
     double full_rho = 0;
     double max_rho = 0;
     double min_rho = 2;
+    /*double max_rho_x = 0;
+    double max_rho_y = 0;*/
     for (int i = 1; i <= mNx; i++)
     {
         for (int j = 1; j <= mNy; j++)
@@ -249,10 +283,17 @@ void Solver::check_rho()
             {
                 max_rho = rho[i][j];
             }
+            /*if (max_rho == rho[i][j])
+            {
+                max_rho_x = i;
+                max_rho_y = j;
+            }*/
         }
     }
     cout << "full rho = " << full_rho << endl;
     cout << "max rho = " << max_rho << "\t" << "min rho = " << min_rho << endl;
+    /*cout << "max rho(x) = " << max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;*/
+    cout << "rho[100][100] = " << rho[100][100] << "\t" << "rho[5][5] = " << rho[5][5] << endl;
 }
 
 
@@ -260,30 +301,38 @@ void Solver::calculate_r_p1_p2()
 {
     
     double r = 0;
+    double s = 0;
     double p1 = 0;
     double p2 = 0;
 
     for (int i = 1; i <= mNx; i++)
+    /*for (int i = 1; i <= mNx; i++)
     {
         for (int j = 1; j <= mNy; j++)
         {
             if (rho[i][j] > 1)
+            if (rho[i][j] > (max_rho + min_rho) / 2.)
             {
                 r++;
+                s++;
             }
         }
     }
-    r = sqrt(r / M_PI);
-    p1 = 8 * temperature * rho[100][100] / (3 - rho[100][100]) - 3 * rho[100][100] * rho[100][100];
-    p2 = 8 * temperature * rho[5][5] / (3 - rho[5][5]) - 3 * rho[5][5] * rho[5][5];
+    r = sqrt(s / M_PI);*/
+    /*p1 = PressurePengRobinson(rho[100][100], temperature);
+    p2 = PressurePengRobinson(rho[5][5], temperature);*/
 
+    p1 = PressureVanDerVaals(rho[200][1], temperature);
+    p2 = PressureVanDerVaals(rho[20][95], temperature);
 
+    cout << "p1 = " << p1 << "\tp2 = " << p2 << "\tdelta p = " << p1 - p2 << endl;
     stringstream fname;
     fname << "DATA/r_p1_p2.txt";
     ofstream vtk_file(fname.str().c_str(), ios_base::app);
-    vtk_file << "Radius = " << r << "\t";
+    /*vtk_file << "Radius = " << r << "\t";*/
     vtk_file << "P in drop = " << p1 << "\t";
-    vtk_file << "P external = " << p2 << "\n";
+    vtk_file << "P external = " << p2 << "\t";
+    vtk_file << "Delta P = " << p1 - p2 << "\n";
     vtk_file.close();
 
     cout << endl << "File " << fname.str() << " written" << endl << endl;
@@ -317,20 +366,50 @@ void Solver::set_effrho_2()
 
     for (int i = 1; i <= mNx; i++) {
         for (int j = 1; j <= mNy; j++) {
-            effrho[i][j] = sqrt(rho[i][j] / 3.0 - 0.01 * (8 * temperature * rho[i][j] / (3 - rho[i][j]) - 3 * rho[i][j] * rho[i][j]));
+            effrho[i][j] = sqrt(rho[i][j] / 3.0 - 0.01 * PressureVanDerVaals(rho[i][j], temperature));
+            sqr_effrho[i][j] = effrho[i][j] * effrho[i][j];
         }
     }
     effrho[0][mNy + 1] = effrho[1][mNy];
     effrho[mNx + 1][mNy + 1] = effrho[mNx][mNy];
-    effrho[0][0] = effrho[1][1];
-    effrho[mNx + 1][0] = effrho[mNx][1];
+    effrho[0][0] = wettability * effrho[1][1];
+    effrho[mNx + 1][0] = wettability * effrho[mNx][1];
+    sqr_effrho[0][0] = wettability * wettability * effrho[0][0] * effrho[0][0];
+    sqr_effrho[0][mNy + 1] = effrho[0][mNy + 1] * effrho[0][mNy + 1];
+    sqr_effrho[mNx + 1][0] = wettability * wettability * effrho[mNx + 1][0] * effrho[mNx + 1][0];
+    sqr_effrho[mNx + 1][mNy + 1] = effrho[mNx + 1][mNy + 1] * effrho[mNx + 1][mNy + 1];
     for (int i = 1; i <= mNx; i++) {
         effrho[i][mNy + 1] = effrho[i][mNy];
-        effrho[i][0] = effrho[i][1];
+        effrho[i][0] = wettability * effrho[i][1];
+        sqr_effrho[i][mNy + 1] = effrho[i][mNy + 1] * effrho[i][mNy + 1];
+        sqr_effrho[i][0] = wettability * wettability * effrho[i][0] * effrho[i][0];
     }
     for (int i = 1; i <= mNy; i++) {
         effrho[0][i] = effrho[1][i];
         effrho[mNx + 1][i] = effrho[mNx][i];
+        sqr_effrho[0][i] = effrho[0][i] * effrho[0][i];
+        sqr_effrho[mNx + 1][i] = effrho[mNx + 1][i] * effrho[mNx + 1][i];
     }
 }
 
+void Solver::check_angle()
+{
+    double h = 0;
+    double l = 0;
+    for (int i = 200; i <= mNx; i++)
+    {
+        if (rho[i][1] > (max_rho + min_rho) / 2) {
+            l++;
+        }
+    }
+    l = l + (rho[200 + l][1] - (max_rho + min_rho) / 2) / (rho[200 + l][1] - rho[200 + l + 1][1]);
+    for (int i = 1; i <= mNy; i++)
+    {
+        if (rho[200][i] > (max_rho + min_rho) / 2) {
+            h++;
+        }
+    }
+    h = h + (rho[200][h] - (max_rho + min_rho) / 2) / (rho[200][h] - rho[200][h + 1]);
+    cout << "h = " << h << "\tl = " << l << "\talpha = " << 2*atan(h / l) * 180.0 / M_PI << endl;
+    
+}

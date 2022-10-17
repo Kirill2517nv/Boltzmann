@@ -13,11 +13,18 @@ class Solver
 public:
 	Solver(int Nx, int Ny, vector<vector<double>>& rho);
 	void SaveVTKFile(int tStep);
-	void oneStep();
+	void oneStepWithoutWalls();
+	void oneStepWithWalls();
 	void check_rho();
 	void calculate_r_p1_p2();
+	void check_angle();
+
+
 
 private:
+	double wettability = 1.02;
+	double max_rho = 0;
+	double min_rho = 2;
 	const double A = -0.152;
 	int mNx;
 	int mNy;
@@ -34,6 +41,8 @@ private:
 	const int dx[9] = { 0,   1, 0, -1,  0,   1, -1, -1,  1 };
 	const int dy[9] = { 0,   0, 1,  0, -1,   1,  1, -1, -1 };
 	
+	double PressureVanDerVaals(double& rho,const double& temperature);
+	double PressurePengRobinson(double& rho, const double& temperature);
 	void set_border_conditions();
 	void set_border_conditions_2();
 	void eq_func(double rho, double ux, double uy, double* f_eq);
