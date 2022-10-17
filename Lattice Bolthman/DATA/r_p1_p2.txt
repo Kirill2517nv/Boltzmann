@@ -1,0 +1,16 @@
+Radius = 37.9352	P in drop = 0.56183		P external = 0.663618
+Radius = 36.8109	P in drop = 0.710758	P external = 0.660957
+Radius = 37.615	P in drop = 0.665044	P external = 0.657017
+Radius = 37.7839	P in drop = 0.676462	P external = 0.652509
+
+
+Radius = 48.1284	P in drop = 0.714245	P external = 0.676187
+Radius = 48.4842	P in drop = 0.623294	P external = 0.654876
+Radius = 49.1234	P in drop = 0.624986	P external = 0.656955
+Radius = 48.6938	P in drop = 0.646368	P external = 0.652754
+
+
+Radius = 58.0019	P in drop = 0.756154	P external = 0.684153
+Radius = 58.7977	P in drop = 0.743368	P external = 0.642213
+Radius = 59.3044	P in drop = 0.698588	P external = 0.653154
+Radius = 59.0893	P in drop = 0.679651	P external = 0.653612
