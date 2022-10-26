@@ -99,7 +99,7 @@ double Solver::PressureVanDerVaals(double& rho, const double& temperature)
     double pressure = 8 * temperature * rho / (3 - rho) - 3 * rho * rho;
     return pressure;
 }
-
+ /* Peng*/
 double a(const double& temperature)
 {
     double omega = 0.1;
