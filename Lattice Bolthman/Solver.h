@@ -22,14 +22,14 @@ public:
 
 
 private:
-	double wettability = 1.02;
+	double wettability = 1.0;
 	double max_rho = 0;
 	double min_rho = 2;
 	const double A = -0.152;
 	int mNx;
 	int mNy;
 	const int tau = 1;
-	const double temperature = 0.9;
+	const double temperature = 0.6;
 	vector<vector<double>> rho;
 	vector<vector<double>> effrho;
 	vector<vector<double>> sqr_effrho;

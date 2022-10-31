@@ -128,7 +128,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Lattice Bolthman.cpp" />
     <ClCompile Include="Lattice Boltzmann.cpp" />
     <ClCompile Include="Solver.cpp" />
   </ItemGroup>

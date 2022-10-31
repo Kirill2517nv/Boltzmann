@@ -74,7 +74,7 @@ void Solver::SaveVTKFile(int tStep)
     cout << endl << "File " << fname.str() << " written" << endl << endl;
 }
 
-void Solver::oneStep()
+void Solver::oneStepWithWalls()
 {
     set_border_conditions_2();
     movement();
@@ -102,7 +102,7 @@ double Solver::PressureVanDerVaals(double& rho, const double& temperature)
  /* Peng*/
 double a(const double& temperature)
 {
-    double omega = 0.1;
+    double omega = 0.2514;
     double m = 0.37464 + 1.54226 * omega - 0.26992 * omega * omega;
     double a = pow((1 + m * (1 - sqrt(temperature))), 2);
     return a;
@@ -197,8 +197,8 @@ void Solver::set_effrho()
     
     for (int i = 1; i <= mNx; i++) {
         for (int j = 1; j <= mNy; j++) {
-            effrho[i][j] = sqrt(rho[i][j] / 3.0 - 0.01 * (8 * temperature * rho[i][j] / (3 - rho[i][j]) - 3 * rho[i][j] * rho[i][j]));
-            sqr_effrho[i][j] = effrho[i][j] * effrho[i][j];
+            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * PressurePengRobinson(rho[i][j], temperature);
+            effrho[i][j] = sqrt(sqr_effrho[i][j]);
         }
     }
     effrho[0][mNy + 1] = effrho[mNx][1];
@@ -212,7 +212,7 @@ void Solver::set_effrho()
     for (int i = 1; i <= mNx; i++) {
         effrho[i][mNy + 1] = effrho[i][1];
         effrho[i][0] = effrho[i][mNy];
-        sqr_effrho[i][mNy + 1] = effrho[i][1] * effrho[i][1];
+        sqr_effrho[i][mNy + 1] = effrho[i][mNy + 1] * effrho[i][mNy + 1];
         sqr_effrho[i][0] = effrho[i][0] * effrho[i][0];
     }
     for (int i = 1; i <= mNy; i++) {
@@ -266,33 +266,43 @@ void Solver::collision()
 void Solver::check_rho()
 {
     double full_rho = 0;
-    double max_rho = 0;
-    double min_rho = 2;
-    /*double max_rho_x = 0;
-    double max_rho_y = 0;*/
+    double max_rho_temp = 0;
+    double min_rho_temp = 2;
+    int max_rho_x = 0;
+    int max_rho_y = 0;
+    int min_rho_x = 0;
+    int min_rho_y = 0;
     for (int i = 1; i <= mNx; i++)
     {
         for (int j = 1; j <= mNy; j++)
         {
             full_rho += rho[i][j];
-            if (rho[i][j] < min_rho)
+            if (rho[i][j] < min_rho_temp)
             {
                 min_rho = rho[i][j];
+                min_rho_temp = rho[i][j];
             }
-            if (rho[i][j] > max_rho)
+            if (rho[i][j] > max_rho_temp)
             {
                 max_rho = rho[i][j];
+                max_rho_temp = rho[i][j];
             }
-            /*if (max_rho == rho[i][j])
+            if (max_rho_temp == rho[i][j])
             {
                 max_rho_x = i;
                 max_rho_y = j;
-            }*/
+            }
+            if (min_rho_temp == rho[i][j])
+            {
+                min_rho_x = i;
+                min_rho_y = j;
+            }
         }
     }
     cout << "full rho = " << full_rho << endl;
     cout << "max rho = " << max_rho << "\t" << "min rho = " << min_rho << endl;
-    /*cout << "max rho(x) = " << max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;*/
+    cout << "max rho(x) = " << max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;
+    cout << "min rho(x) = " << min_rho_x << "\t" << "min rho(y) = " << min_rho_y << endl;
     cout << "rho[100][100] = " << rho[100][100] << "\t" << "rho[5][5] = " << rho[5][5] << endl;
 }
 
@@ -305,31 +315,29 @@ void Solver::calculate_r_p1_p2()
     double p1 = 0;
     double p2 = 0;
 
+    
     for (int i = 1; i <= mNx; i++)
-    /*for (int i = 1; i <= mNx; i++)
     {
         for (int j = 1; j <= mNy; j++)
         {
-            if (rho[i][j] > 1)
             if (rho[i][j] > (max_rho + min_rho) / 2.)
             {
-                r++;
                 s++;
             }
         }
     }
-    r = sqrt(s / M_PI);*/
+    r = sqrt(s / M_PI);
     /*p1 = PressurePengRobinson(rho[100][100], temperature);
     p2 = PressurePengRobinson(rho[5][5], temperature);*/
 
-    p1 = PressureVanDerVaals(rho[200][1], temperature);
-    p2 = PressureVanDerVaals(rho[20][95], temperature);
+    p1 = PressurePengRobinson(rho[100][100], temperature);
+    p2 = PressurePengRobinson(rho[5][5], temperature);
 
     cout << "p1 = " << p1 << "\tp2 = " << p2 << "\tdelta p = " << p1 - p2 << endl;
     stringstream fname;
-    fname << "DATA/r_p1_p2.txt";
+    fname << "DATA/T = 0.6.txt";
     ofstream vtk_file(fname.str().c_str(), ios_base::app);
-    /*vtk_file << "Radius = " << r << "\t";*/
+    vtk_file << "Radius = " << r << "\t";
     vtk_file << "P in drop = " << p1 << "\t";
     vtk_file << "P external = " << p2 << "\t";
     vtk_file << "Delta P = " << p1 - p2 << "\n";
@@ -366,8 +374,8 @@ void Solver::set_effrho_2()
 
     for (int i = 1; i <= mNx; i++) {
         for (int j = 1; j <= mNy; j++) {
-            effrho[i][j] = sqrt(rho[i][j] / 3.0 - 0.01 * PressureVanDerVaals(rho[i][j], temperature));
-            sqr_effrho[i][j] = effrho[i][j] * effrho[i][j];
+            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * PressurePengRobinson(rho[i][j], temperature);
+            effrho[i][j] = sqrt(sqr_effrho[i][j]);
         }
     }
     effrho[0][mNy + 1] = effrho[1][mNy];
