@@ -7,12 +7,12 @@ int main()
     int nx = 200;
     int ny = 200;
     int max_time = 20000;
-    vector<vector<double>> rho(nx + 2, vector<double>(ny + 2, 0.00825)); /*при t=0.8 rho_min = 0.24, rho_max = 1.93 при t = 0.9 rho_min = 0.42 rho_max = 1.68*/
+    vector<vector<double>> rho(nx + 2, vector<double>(ny + 2, 0.00825)); 
     for (int i = 1; i < nx + 1; i++)
     {
         for (int j = 1; j < ny + 1; j++)
         {
-            if ((i - 100) * (i - 100)  + (j - 100) * (j - 100) <= 1600)
+            if ((i - 100) * (i - 100)  + (j - 100) * (j - 100) <= 1225)
             {
                 rho[i][j] = 3.253;
             }

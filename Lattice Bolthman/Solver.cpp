@@ -299,11 +299,11 @@ void Solver::check_rho()
             }
         }
     }
-    cout << "full rho = " << full_rho << endl;
-    cout << "max rho = " << max_rho << "\t" << "min rho = " << min_rho << endl;
-    cout << "max rho(x) = " << max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;
-    cout << "min rho(x) = " << min_rho_x << "\t" << "min rho(y) = " << min_rho_y << endl;
-    cout << "rho[100][100] = " << rho[100][100] << "\t" << "rho[5][5] = " << rho[5][5] << endl;
+    cout << "full rho = " << setprecision(6) << full_rho << endl;
+    cout << "max rho = " << setprecision(6) << max_rho << "\t" << "min rho = " << min_rho << endl;
+    cout << "max rho(x) = " << setprecision(6) << max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;
+    cout << "min rho(x) = " << setprecision(6) << min_rho_x << "\t" << "min rho(y) = " << min_rho_y << endl;
+    cout << "rho[100][100] = " << setprecision(6) << rho[100][100] << "\t" << "rho[5][5] = " << rho[5][5] << endl;
 }
 
 
@@ -333,14 +333,14 @@ void Solver::calculate_r_p1_p2()
     p1 = PressurePengRobinson(rho[100][100], temperature);
     p2 = PressurePengRobinson(rho[5][5], temperature);
 
-    cout << "p1 = " << p1 << "\tp2 = " << p2 << "\tdelta p = " << p1 - p2 << endl;
+    cout << "p1 = " << setprecision(6) << p1 << "\tp2 = " << p2 << "\tdelta p = " << p1 - p2 << endl;
     stringstream fname;
-    fname << "DATA/T = 0.6.txt";
+    fname << "DATA/T = 0.6 r = 35.txt";
     ofstream vtk_file(fname.str().c_str(), ios_base::app);
-    vtk_file << "Radius = " << r << "\t";
-    vtk_file << "P in drop = " << p1 << "\t";
-    vtk_file << "P external = " << p2 << "\t";
-    vtk_file << "Delta P = " << p1 - p2 << "\n";
+    vtk_file << "Radius = " << setprecision(6) << r << "\t";
+    vtk_file << "P in drop = " << setprecision(6) << p1 << "\t";
+    vtk_file << "P external = " << setprecision(6) << p2 << "\t";
+    vtk_file << "Delta P = " << setprecision(6) << p1 - p2 << "\n";
     vtk_file.close();
 
     cout << endl << "File " << fname.str() << " written" << endl << endl;
