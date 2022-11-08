@@ -17,7 +17,7 @@ public:
 	Solver(int Nx, int Ny, vector<vector<double>>& rho);
 	Solver(int Nx, int Ny, vector<vector<vector<double>>>& rho, 
 		int numberspec, vector<double> crit_temp, vector<double> crit_rho, 
-		vector<double> molmass);
+		vector<double> molmass, vector<double> omega1);
 	void SaveVTKFile(int tStep);
 	void oneStepWithoutWalls();
 	void oneStepWithoutWallsMulticomponent();
@@ -39,6 +39,7 @@ private:
 	int mNx;
 	int mNy;
 	int number_of_species;
+	vector<double> omega;
 	vector<double> critical_temperatures;
 	vector<double> critical_rho;
 	vector<double> molarmass;
@@ -57,7 +58,7 @@ private:
 	const int dy[9] = { 0,   0, 1,  0, -1,   1,  1, -1, -1 };
 	
 	double PressureVanDerVaals(double& rho,const double& temperature);
-	double PressurePengRobinson(double& rho, const double& temperature);
+	double PressurePengRobinson(double& rho, const double& temperature, double omega);
 	void PressurePengRobinsonMulticomponent();
 	void set_border_conditions();
 	void set_border_conditions_2();

@@ -30,7 +30,7 @@ Solver::Solver(int Nx, int Ny, vector<vector<double>>& rho) :
 
 Solver::Solver(int Nx, int Ny, vector<vector<vector<double>>>& rho, 
     int numberspec, vector<double> crit_temp, vector<double> crit_rho, 
-    vector<double> molmass) :
+    vector<double> molmass, vector<double> omega1) :
     mNx(Nx),
     mNy(Ny),
     rhomulticomponent(rho),
@@ -38,6 +38,8 @@ Solver::Solver(int Nx, int Ny, vector<vector<vector<double>>>& rho,
     critical_temperatures(crit_temp),
     critical_rho(crit_rho),
     molarmass(molmass),
+    omega(omega1),
+    rho(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     pressure(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     ux(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     uy(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
@@ -102,6 +104,19 @@ void Solver::SaveVTKFile(int tStep)
     for (int j = 1; j <= mNy; j++)
         for (int i = 1; i <= mNx; i++) vtk_file << rho[i][j] << " ";
     vtk_file << endl;
+    for (int numspec = 0; numspec < number_of_species; numspec++)
+    {
+        vtk_file << "SCALARS rho" << numspec << " double 1\n";
+        vtk_file << "LOOKUP_TABLE default\n";
+        for (int j = 1; j <= mNy; j++)
+            for (int i = 1; i <= mNx; i++) vtk_file << rhomulticomponent[numspec][i][j] << " ";
+        vtk_file << endl;
+    }
+    vtk_file << "SCALARS pressure double 1\n";
+    vtk_file << "LOOKUP_TABLE default\n";
+    for (int j = 1; j <= mNy; j++)
+        for (int i = 1; i <= mNx; i++) vtk_file << pressure[i][j] << " ";
+    vtk_file << endl;
     vtk_file << "VECTORS uflow double\n";
     for (int j = 1; j <= mNy; j++)
         for (int i = 1; i <= mNx; i++) vtk_file << ux[i][j] << "  " << uy[i][j] << "  0.0" << " ";
@@ -137,6 +152,7 @@ void Solver::oneStepWithoutWallsMulticomponent()
     set_border_conditions_multicomponent();
     movement_multicomponent();
     set_rho_u_multicomponent();
+    PressurePengRobinsonMulticomponent();
     set_effrho_multicomponent();
     set_du_force();
     collision_multicomponent();
@@ -148,19 +164,18 @@ double Solver::PressureVanDerVaals(double& rho, const double& temperature)
     return pressure;
 }
  /* Peng*/
-double a(const double& temperature)
+double a(const double& temperature, double omega)
 {
-    double omega = 0.2514;
     double m = 0.37464 + 1.54226 * omega - 0.26992 * omega * omega;
     double a = pow((1 + m * (1 - sqrt(temperature))), 2);
     return a;
 }
 
-double Solver::PressurePengRobinson(double& rho, const double& temperature)
+double Solver::PressurePengRobinson(double& rho, const double& temperature, double omega)
 {
     
     double pressure = 1 / 0.307 * (temperature / (1. / rho - 0.253) - 
-        1.487 * a(temperature) / (1. / rho / rho + 2 * 0.253 / rho - 0.253 * 0.253));
+        1.487 * a(temperature, omega) / (1. / rho / rho + 2 * 0.253 / rho - 0.253 * 0.253));
     return pressure;
 }
 
@@ -187,8 +202,8 @@ void Solver::PressurePengRobinsonMulticomponent()
                             (critical_temperatures[numspec2] / critical_temperatures[0] *
                             molarmass[0] / molarmass[numspec2] *
                             critical_rho[0] / critical_rho[numspec2]) *
-                            a(temperature * critical_temperatures[0] / critical_temperatures[numspec]) *
-                            a(temperature * critical_temperatures[0] / critical_temperatures[numspec2])
+                            a(temperature * critical_temperatures[0] / critical_temperatures[numspec], omega[numspec]) *
+                            a(temperature * critical_temperatures[0] / critical_temperatures[numspec2], omega[numspec2])
                                 );
                 }
 
@@ -365,7 +380,7 @@ void Solver::set_effrho()
     
     for (int i = 1; i <= mNx; i++) {
         for (int j = 1; j <= mNy; j++) {
-            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * PressurePengRobinson(rho[i][j], temperature);
+            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * PressurePengRobinson(rho[i][j], temperature, omega[0]);
             effrho[i][j] = sqrt(sqr_effrho[i][j]);
         }
     }
@@ -396,7 +411,7 @@ void Solver::set_effrho_multicomponent()
 
     for (int i = 1; i <= mNx; i++) {
         for (int j = 1; j <= mNy; j++) {
-            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * pressure[i][j];
+            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.001 * pressure[i][j];
             effrho[i][j] = sqrt(sqr_effrho[i][j]);
         }
     }
@@ -520,11 +535,11 @@ void Solver::check_rho()
             }
         }
     }
-    cout << "full rho = " << setprecision(6) << full_rho << endl;
-    cout << "max rho = " << setprecision(6) << max_rho << "\t" << "min rho = " << min_rho << endl;
-    cout << "max rho(x) = " << setprecision(6) << max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;
-    cout << "min rho(x) = " << setprecision(6) << min_rho_x << "\t" << "min rho(y) = " << min_rho_y << endl;
-    cout << "rho[100][100] = " << setprecision(6) << rho[100][100] << "\t" << "rho[5][5] = " << rho[5][5] << endl;
+    cout << "full rho = " <<  full_rho << endl;
+    cout << "max rho = " <<  max_rho << "\t" << "min rho = " << min_rho << endl;
+    cout << "max rho(x) = " <<  max_rho_x << "\t" << "max rho(y) = " << max_rho_y << endl;
+    cout << "min rho(x) = " <<  min_rho_x << "\t" << "min rho(y) = " << min_rho_y << endl;
+    cout << "rho[100][100] = " << rho[100][100] << "\t" << "rho[5][5] = " << rho[5][5] << endl;
 }
 
 
@@ -551,8 +566,8 @@ void Solver::calculate_r_p1_p2()
     /*p1 = PressurePengRobinson(rho[100][100], temperature);
     p2 = PressurePengRobinson(rho[5][5], temperature);*/
 
-    p1 = PressurePengRobinson(rho[100][100], temperature);
-    p2 = PressurePengRobinson(rho[5][5], temperature);
+    p1 = PressurePengRobinson(rho[100][100], temperature, omega[0]);
+    p2 = PressurePengRobinson(rho[5][5], temperature, omega[0]);
 
     cout << "p1 = " << setprecision(6) << p1 << "\tp2 = " << p2 << "\tdelta p = " << p1 - p2 << endl;
     stringstream fname;
@@ -595,7 +610,7 @@ void Solver::set_effrho_2()
 
     for (int i = 1; i <= mNx; i++) {
         for (int j = 1; j <= mNy; j++) {
-            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * PressurePengRobinson(rho[i][j], temperature);
+            sqr_effrho[i][j] = rho[i][j] / 3.0 - 0.01 * PressurePengRobinson(rho[i][j], temperature, omega[0]);
             effrho[i][j] = sqrt(sqr_effrho[i][j]);
         }
     }
