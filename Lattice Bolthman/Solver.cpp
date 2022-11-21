@@ -30,7 +30,7 @@ Solver::Solver(int Nx, int Ny, vector<vector<double>>& rho) :
 
 Solver::Solver(int Nx, int Ny, vector<vector<vector<double>>>& rho, 
     int numberspec, vector<double> crit_temp, vector<double> crit_rho, 
-    vector<double> molmass, vector<double> omega1) :
+    vector<double> molmass, vector<double> omega1, vector<double> gamma1) :
     mNx(Nx),
     mNy(Ny),
     rhomulticomponent(rho),
@@ -39,12 +39,19 @@ Solver::Solver(int Nx, int Ny, vector<vector<vector<double>>>& rho,
     critical_rho(crit_rho),
     molarmass(molmass),
     omega(omega1),
+    gamma(gamma1),
+    gamma_multiply_rho(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     rho(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     pressure(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     ux(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     uy(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     dux_force(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     duy_force(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
+    hi(numberspec, vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
+    ux_spec(numberspec, vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
+    uy_spec(numberspec, vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
+    dux_force_spec(numberspec, vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
+    duy_force_spec(numberspec, vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     effrho(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     sqr_effrho(vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))),
     fmulticomponent(numberspec, vector<vector<vector<double>>>(9, vector<vector<double>>(Nx + 2, vector<double>(Ny + 2))))
@@ -121,6 +128,14 @@ void Solver::SaveVTKFile(int tStep)
     for (int j = 1; j <= mNy; j++)
         for (int i = 1; i <= mNx; i++) vtk_file << ux[i][j] << "  " << uy[i][j] << "  0.0" << " ";
     vtk_file << endl;
+    
+    for (int numspec = 0; numspec < number_of_species; numspec++)
+    {
+        vtk_file << "VECTORS uflow" << numspec <<" double\n";
+        for (int j = 1; j <= mNy; j++)
+            for (int i = 1; i <= mNx; i++) vtk_file << ux_spec[numspec][i][j] << "  " << uy_spec[numspec][i][j] << "  0.0" << " ";
+        vtk_file << endl;
+    }
     vtk_file.close();
 
     cout << endl << "File " << fname.str() << " written" << endl << endl;
@@ -154,7 +169,7 @@ void Solver::oneStepWithoutWallsMulticomponent()
     set_rho_u_multicomponent();
     PressurePengRobinsonMulticomponent();
     set_effrho_multicomponent();
-    set_du_force();
+    set_du_force_multicomponent();
     collision_multicomponent();
 }
 
@@ -357,13 +372,20 @@ void Solver::set_rho_u_multicomponent()
                 {
                     rhomulticomponent[numspec][i][j] += fmulticomponent[numspec][k][i][j];
                 }
+                gamma_multiply_rho[i][j] += gamma[numspec] * rhomulticomponent[numspec][i][j];
                 rho[i][j] += rhomulticomponent[numspec][i][j];
-                ux[i][j] = (fmulticomponent[numspec][1][i][j] + fmulticomponent[numspec][5][i][j] +
+                ux[i][j] += (fmulticomponent[numspec][1][i][j] + fmulticomponent[numspec][5][i][j] +
                     fmulticomponent[numspec][8][i][j] - fmulticomponent[numspec][3][i][j] -
                     fmulticomponent[numspec][6][i][j] - fmulticomponent[numspec][7][i][j]);
-                uy[i][j] = (fmulticomponent[numspec][2][i][j] + fmulticomponent[numspec][5][i][j] + 
+                uy[i][j] += (fmulticomponent[numspec][2][i][j] + fmulticomponent[numspec][5][i][j] + 
                     fmulticomponent[numspec][6][i][j] - fmulticomponent[numspec][4][i][j] - 
                     fmulticomponent[numspec][7][i][j] - fmulticomponent[numspec][8][i][j]);
+                ux_spec[numspec][i][j] = (fmulticomponent[numspec][1][i][j] + fmulticomponent[numspec][5][i][j] +
+                    fmulticomponent[numspec][8][i][j] - fmulticomponent[numspec][3][i][j] -
+                    fmulticomponent[numspec][6][i][j] - fmulticomponent[numspec][7][i][j]) / rhomulticomponent[numspec][i][j];
+                uy_spec[numspec][i][j] = (fmulticomponent[numspec][2][i][j] + fmulticomponent[numspec][5][i][j] +
+                    fmulticomponent[numspec][6][i][j] - fmulticomponent[numspec][4][i][j] -
+                    fmulticomponent[numspec][7][i][j] - fmulticomponent[numspec][8][i][j]) / rhomulticomponent[numspec][i][j];
                 
             }
             ux[i][j] = ux[i][j] / rho[i][j];
@@ -457,6 +479,32 @@ void Solver::set_du_force()
     }
 }
 
+void Solver::set_du_force_multicomponent()
+{
+    for (int i = 1; i <= mNx; i++) {
+        for (int j = 1; j <= mNy; j++) {
+            double force_x = 0;
+            force_x = 2.0 / 3 * ((1 - 2 * A2) * effrho[i][j] * (effrho[i + 1][j] - effrho[i - 1][j] +
+                0.25 * (effrho[i + 1][j + 1] + effrho[i + 1][j - 1] - effrho[i - 1][j + 1] - effrho[i - 1][j - 1])) +
+                A2 * (sqr_effrho[i + 1][j] - sqr_effrho[i - 1][j] + 0.25 *
+                    (sqr_effrho[i + 1][j + 1] + sqr_effrho[i + 1][j - 1] - sqr_effrho[i - 1][j + 1] - sqr_effrho[i - 1][j - 1])));
+            dux_force[i][j] = force_x / rho[i][j];
+            double force_y = 0;
+            force_y = 2.0 / 3 * ((1 - 2 * A2) * effrho[i][j] * (effrho[i][j + 1] - effrho[i][j - 1] +
+                0.25 * (effrho[i + 1][j + 1] + effrho[i - 1][j + 1] - effrho[i + 1][j - 1] - effrho[i - 1][j - 1])) +
+                A2 * (sqr_effrho[i][j + 1] - sqr_effrho[i][j - 1] + 0.25 *
+                    (sqr_effrho[i + 1][j + 1] + sqr_effrho[i - 1][j + 1] - sqr_effrho[i + 1][j - 1] - sqr_effrho[i - 1][j - 1])));
+            duy_force[i][j] = force_y / rho[i][j];
+
+            for (int numspec = 0; numspec < number_of_species; numspec++) {
+                hi[numspec][i][j] = gamma[numspec] * rhomulticomponent[numspec][i][j] / gamma_multiply_rho[i][j];
+                dux_force_spec[numspec][i][j] = force_x * hi[numspec][i][j] / rhomulticomponent[numspec][i][j];
+                duy_force_spec[numspec][i][j] = force_y * hi[numspec][i][j] / rhomulticomponent[numspec][i][j];
+                
+            }
+        }
+    }
+}
 
 void Solver::collision()
 {
@@ -486,8 +534,9 @@ void Solver::collision_multicomponent()
         {
             for (int j = 1; j <= mNy; j++)
             {
-                eq_func(rhomulticomponent[numspec][i][j], ux[i][j], uy[i][j], f_eq);
-                eq_func(rhomulticomponent[numspec][i][j], ux[i][j] + dux_force[i][j], uy[i][j] + duy_force[i][j], f_eq_n);
+                eq_func(rhomulticomponent[numspec][i][j], ux_spec[numspec][i][j], uy_spec[numspec][i][j], f_eq);
+                eq_func(rhomulticomponent[numspec][i][j], ux_spec[numspec][i][j] + dux_force_spec[numspec][i][j],
+                    uy_spec[numspec][i][j] + duy_force_spec[numspec][i][j], f_eq_n);
                 for (int k = 0; k < 9; k++)
                 {
                     fmulticomponent[numspec][k][i][j] += f_eq_n[k] - f_eq[k] + (f_eq[k] - fmulticomponent[numspec][k][i][j]) / tau;

@@ -17,7 +17,7 @@ public:
 	Solver(int Nx, int Ny, vector<vector<double>>& rho);
 	Solver(int Nx, int Ny, vector<vector<vector<double>>>& rho, 
 		int numberspec, vector<double> crit_temp, vector<double> crit_rho, 
-		vector<double> molmass, vector<double> omega1);
+		vector<double> molmass, vector<double> omega1, vector<double> gamma1);
 	void SaveVTKFile(int tStep);
 	void oneStepWithoutWalls();
 	void oneStepWithoutWallsMulticomponent();
@@ -31,7 +31,7 @@ public:
 private:
 	double wettability = 1.0;
 	double max_rho = 0;
-	double min_rho = 10;
+	double min_rho = 100;
 	const double A = -0.152;
 	const double A2 = -0.0456; /*Пенг-Робинсон*/
 	const int tau = 1;
@@ -39,10 +39,12 @@ private:
 	int mNx;
 	int mNy;
 	int number_of_species;
+	vector<double> gamma;
 	vector<double> omega;
 	vector<double> critical_temperatures;
 	vector<double> critical_rho;
 	vector<double> molarmass;
+	vector<vector<double>> gamma_multiply_rho;
 	vector<vector<double>> rho;
 	vector<vector<double>> effrho;
 	vector<vector<double>> sqr_effrho;
@@ -50,6 +52,11 @@ private:
 	vector<vector<double>> uy;
 	vector<vector<double>> dux_force;
 	vector<vector<double>> duy_force;
+	vector<vector<vector<double>>> hi;
+	vector<vector<vector<double>>> ux_spec;
+	vector<vector<vector<double>>> uy_spec;
+	vector<vector<vector<double>>> dux_force_spec;
+	vector<vector<vector<double>>> duy_force_spec;
 	vector<vector<vector<double>>> f;
 	vector<vector<vector<double>>> rhomulticomponent;
 	vector<vector<vector<vector<double>>>> fmulticomponent;
@@ -72,6 +79,7 @@ private:
 	void set_effrho_multicomponent();
 	void set_effrho_2();
 	void set_du_force();
+	void set_du_force_multicomponent();
 	void collision();
 	void collision_multicomponent();
 
